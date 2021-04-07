@@ -11,6 +11,7 @@ export class App extends Component {
       winner: false,
       emptyIndex: 0
     }
+    this.shuffleBoard = this.shuffleBoard.bind(this);
     this.tileClicked = this.tileClicked.bind(this);
   }
 
@@ -24,6 +25,7 @@ export class App extends Component {
       })
       if (i === 15) {
         newBoard[15].blank = true
+        newBoard[15].id = ''
       }
     }
     this.setState({ emptyIndex: 15 })
@@ -32,30 +34,30 @@ export class App extends Component {
 
 
   tileClicked(clickedIndex) {
-    //let row = Math.floor(i / n);
-    //let col = i % n;
+    let emptyIndex = this.state.emptyIndex;
+    let blankRow = Math.floor(emptyIndex / 4);
+    let rowClicked = Math.floor(clickedIndex / 4);
+    let blankCol = emptyIndex % 4;
+    let colClicked = clickedIndex % 4;
+   
 
-        // - if clicked row equals empty row && Math.abs(clicked col - empty col) === 1
-    //     swap
-    // - if clicked col equals empty col && Math.abs(clicked row - empty row) === 1
-    //     swap
-    // - else
-    //     don't swap
- 
-    this.tileSwap(clickedIndex)
+      if (rowClicked === blankRow && Math.abs(colClicked - blankCol) === 1) {
+        this.tileSwap(clickedIndex, emptyIndex)
+      } else if (colClicked === blankCol && Math.abs(rowClicked - blankRow) === 1) {
+        this.tileSwap(clickedIndex, emptyIndex)
+    }
   }
 
   tileSwap(clickedIndex) {
+
     let newBoard = this.state.board;
     let temp = newBoard[this.state.emptyIndex]
     newBoard[this.state.emptyIndex] = newBoard[clickedIndex]
     newBoard[clickedIndex] = temp;
-    //console.log('clicked: ', clickedIndex, 'empty: ', emptyIndex)
     this.setState({ emptyIndex: clickedIndex });
     this.setState({ board: newBoard });
 
   }
-
 
   winCondition() {
     for (let i = 0; i < this.state.board.length; i++) {
@@ -68,8 +70,10 @@ export class App extends Component {
 
 
   shuffleBoard() {
-    //reuse tile click and shuffle multiply 700x
-
+    // let shuffleBoard = this.state.board
+    // //this.tileClicked(clickedIndex)
+    // this.setState({ board: shuffleBoard})
+   alert("hello");
   }
 
   render() {
@@ -85,7 +89,7 @@ export class App extends Component {
         </div>
         <br></br>
 
-        <div className="btn btn-primary">Every Day Im Shuffling</div>
+        <div className="btn btn-primary" onClick={this.shuffleBoard} >Every Day Im Shuffling</div>
 
       </div>
     )
