@@ -4,10 +4,11 @@ export default function tile(props) {
     
     
     return (
-        <div className="col-3 border">
+        <div className="col-3 border" onClick={() => props.tileClicked(props.index)}>
 
-
-         {props.id}  
+        {/* if props.tile.blank is true then render empty string */}
+        
+         {props.tile.id}  
 
         </div>
     )
