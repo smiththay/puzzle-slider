@@ -6,89 +6,105 @@ import Tile from './Tile'
 export class App extends Component {
   constructor(props) {
     super(props);
+    //create state
     this.state = {
       board: [],
       winner: false,
-      emptyIndex: 0
+      emptyIndex: 15
     }
+    //bind our click handlers
     this.shuffleBoard = this.shuffleBoard.bind(this);
     this.tileClicked = this.tileClicked.bind(this);
+    this.clickHelper = this.clickHelper.bind(this);
+
   }
 
   componentDidMount() {
-
+    //define a new variable as an empty array
     let newBoard = [];
+    //we iterate 16 times to create puzzle pieces
     for (let i = 0; i < 16; i++) {
+      // push our new objects into newBoard array
       newBoard.push({
-        id: i,
-        blank: false,
+        //giving them an id and a boolean
+        id: i
       })
       if (i === 15) {
-        newBoard[15].blank = true
+        //we make index 15 of newBoard to have id be empty string
         newBoard[15].id = ''
       }
     }
-    this.setState({ emptyIndex: 15 })
+    //this.setState({ emptyIndex: 15 })
+    //we then mutate state of board to newBoard variable
     this.setState({ board: newBoard });
   }
 
+  clickHelper(clickedIndex) {
 
-  tileClicked(clickedIndex) {
-    let emptyIndex = this.state.emptyIndex;
+    let [newBoard, emptyIndex]= this.tileClicked(clickedIndex, this.state.emptyIndex, this.state.board)
+    this.setState({ board: newBoard, emptyIndex})
+
+  }
+
+  tileClicked(clickedIndex, emptyIndex, currentBoard) {
+   
     let blankRow = Math.floor(emptyIndex / 4);
     let rowClicked = Math.floor(clickedIndex / 4);
     let blankCol = emptyIndex % 4;
     let colClicked = clickedIndex % 4;
-   
 
-      if (rowClicked === blankRow && Math.abs(colClicked - blankCol) === 1) {
-        this.tileSwap(clickedIndex, emptyIndex)
-      } else if (colClicked === blankCol && Math.abs(rowClicked - blankRow) === 1) {
-        this.tileSwap(clickedIndex, emptyIndex)
+    if ((rowClicked === blankRow && Math.abs(colClicked - blankCol) === 1)
+      || (colClicked === blankCol && Math.abs(rowClicked - blankRow) === 1)) {
+      return this.tileSwap(clickedIndex, emptyIndex, currentBoard)
     }
+    return [currentBoard, emptyIndex]
   }
 
-  tileSwap(clickedIndex) {
+  tileSwap(clickedIndex, emptyIndex, newBoard) {
 
-    let newBoard = this.state.board;
-    let temp = newBoard[this.state.emptyIndex]
-    newBoard[this.state.emptyIndex] = newBoard[clickedIndex]
+    //let newBoard = this.state.board;
+    let temp = newBoard[emptyIndex]
+    newBoard[emptyIndex] = newBoard[clickedIndex]
     newBoard[clickedIndex] = temp;
-    this.setState({ emptyIndex: clickedIndex });
-    this.setState({ board: newBoard });
-
+    emptyIndex = clickedIndex;
+    return [newBoard, emptyIndex];
+    // this.setState({ emptyIndex: clickedIndex });
+    // this.setState({ board: newBoard });
   }
 
   winCondition() {
+
     for (let i = 0; i < this.state.board.length; i++) {
       if (this.state.board[i].id === i) {
-        return true;
+        this.state.winner = true
       }
     }
     alert("winner")
   }
 
-
   shuffleBoard() {
-    // let shuffleBoard = this.state.board
-    // //this.tileClicked(clickedIndex)
-    // this.setState({ board: shuffleBoard})
-   alert("hello");
+    // alert("hello");
+    let shuffleBoard = this.state.board;
+    let emptyIndex = this.state.emptyIndex;
+    for (let i = 0; i < 100; i++) {
+      let randomIndex = Math.floor(Math.random() * 16);
+      [shuffleBoard, emptyIndex ] = this.tileClicked(randomIndex, emptyIndex, shuffleBoard)
+    }
+    this.setState({ board: shuffleBoard, emptyIndex})
   }
 
   render() {
     return (
-
       <div className="App">
         <h1> Puzzle Slider </h1>
+        {/* if winner?  is true than display winner  */}
         <div className='container'>
           <div className="row">
 
-            {this.state.board.map((tile, index) => <Tile tileClicked={this.tileClicked} key={tile.id} tile={tile} index={index} />)}
+            {this.state.board.map((tile, index) => <Tile tileClicked={this.clickHelper} key={tile.id} tile={tile} index={index} />)}
           </div>
         </div>
         <br></br>
-
         <div className="btn btn-primary" onClick={this.shuffleBoard} >Every Day Im Shuffling</div>
 
       </div>
